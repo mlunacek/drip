@@ -1,9 +1,9 @@
 from django.conf.urls.defaults import *
 from piston.resource import Resource
-from drip.handlers import NodeDataHandler
+from drip.models import NodeTestHandler
 
-nodedata_handler = Resource(NodeDataHandler)
+nodetest_handler = Resource(NodeTestHandler)
 
 urlpatterns = patterns('',
-   url(r'^api/(?P<emitter_format>.+)/$', nodedata_handler),
+   url(r'^api/node/(?P<emitter_format>.+)/$', nodetest_handler),
 )

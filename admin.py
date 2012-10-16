@@ -1,5 +1,5 @@
-from drip.models import NodeData
+from drip.models import NodeTest, Test
 from django.contrib import admin
 
-admin.site.register(NodeData)
-
+admin.site.register(NodeTest)
+admin.site.register(Test)
