@@ -17,21 +17,25 @@ class NodeTest(models.Model):
     test_date = models.DateTimeField(db_index=True)
     
     def __unicode__(self):
-            return self.node_name + " " + str(self.test_date)
+        return self.node_name + " " + str(self.test_date)
     
+    def test_string(self):
+        qs = self.node_test.all().order_by('test_name')
+        strlist = [ str(q.value) for q in qs ]
+        return ", ".join(strlist)
+        
     class Meta:
         unique_together = ('node_name', 'test_date')
     
 class Test(models.Model):
     test_name = models.CharField(max_length=2, choices=TEST_CHOICES)   
     value = models.FloatField(null=True, blank=True) 
-    node_test = models.ForeignKey('drip.NodeTest', related_name='node_test')
+    node_test = models.ForeignKey(NodeTest, related_name='node_test')
     
     def __unicode__(self):
             return self.test_name
       
       
-            
 class NodeTestHandler(BaseHandler):
    
    allowed_methods = ('GET','PUT','POST',)

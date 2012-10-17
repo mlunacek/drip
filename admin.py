@@ -7,6 +7,7 @@ class TestAdmin(admin.ModelAdmin):
 admin.site.register(Test, TestAdmin)
 
 class NodeTestAdmin(admin.ModelAdmin):
-    list_display = ('node_name', 'test_date')
+    list_display = ('node_name', 'test_date', 'test_string')
+    date_hierarchy  = 'test_date'
     
 admin.site.register(NodeTest, NodeTestAdmin)    

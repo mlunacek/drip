@@ -7,11 +7,26 @@ from django.views.generic import ListView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 
+from drip.models import NodeTest, Test
+
+
 
 def node_view(request):
-    data={}
-
     
+    data={}
+    
+    t = NodeTest.objects.select_related().all()[0]
+    print t.id
+    print dir(t)
+    print t.node_name
+    print t.test_date
+    d = Test.objects.select_related().filter(node_test=t)
+    for x in d:
+        print x.test_name + " " + str(x.value) + " " 
+
+    t = NodeTest.objects.select_related().all()[0]
+    print t.node_test.all()
+
 
 
 
