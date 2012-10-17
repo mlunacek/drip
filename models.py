@@ -17,7 +17,7 @@ class NodeTest(models.Model):
     test_date = models.DateTimeField(db_index=True)
     
     def __unicode__(self):
-            return self.node_name
+            return self.node_name + " " + str(self.test_date)
     
     class Meta:
         unique_together = ('node_name', 'test_date')
