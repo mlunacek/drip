@@ -10,6 +10,12 @@ TEST_CHOICES = (
     ('s4', 'stream4'),
     ('l1', 'linpack1'),
     ('l2', 'linpack2'),
+    ('omm_passed', 'omm_passed'),
+    ('ib_present', 'ib_present'),
+    ('ib_state', 'ib_state'),
+    ('ib_link', 'ib_link'),
+    ('ib_rate', 'ib_rate'),
+    ('health_check_passed', 'health_check_passed'),
 )    
 
 class NodeTest(models.Model):

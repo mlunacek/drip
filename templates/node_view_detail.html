@@ -1,0 +1,43 @@
+
+{% extends "base.html" %}
+{% block title %}Summary{% endblock %}
+
+{% block current_date %} {{current_date.p}} {% endblock %}
+
+{% block content %}
+
+<p>
+<a class="btn" href="{% url node_query %}"> query again </a>
+<a class="btn" href="/benchmarks/nodes/{{ name }}"> back to {{ name }} </a>
+</p>
+
+
+{% if node %}
+{% for x in node.all %}	
+<h3> {{x.node_name}}</h3>
+<div id="node_detail_table">
+<table class="table table-condensed table-striped">
+    <tbody>	
+		<tr><td>Date</td><td>{{x.test_date}}</td></tr>
+		{% for y in x.node_test.all %}
+		<tr><td>{{ y.test_name }}</td><td>{{y.value}}</td></tr>
+		{% endfor %}
+	</tbody>
+</table>
+</div>
+{% endfor %}
+{% else %}
+<div>
+    <p>No data found.</p>
+	<a href="{% url node_query %}"> back to node query </a>
+</div>
+{% endif %}	
+
+
+
+
+
+{% endblock %}
+
+
+

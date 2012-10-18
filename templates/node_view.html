@@ -5,6 +5,61 @@
 {% block current_date %} {{current_date.p}} {% endblock %}
 
 {% block content %}
+<p>
+<a class="btn" href="{% url node_query %}"> query again </a>
+</p>
+{% if node_list %}
+
+
+<div class="pagination">
+  <ul id="pagination-menu">
+	<li><a href="?page={{1}}">First</a></li>
+    <li><a href="?page={{ node_list.previous_page_number }}"><</a></li>
+    <li><a href="?page={{ node_list.next_page_number }}">></a></li>
+	<li><a href="?page={{ node_list.paginator.num_pages}}">Last</a></li>
+  </ul>
+  <span id="pagination-text">Page {{ node_list.number }} of {{ node_list.paginator.num_pages }}</span>
+</div>
+
+
+<h3> Node List </h3>
+<div id="node_summary_table">
+<table class="table table-condensed table-striped">
+<thead>
+	<tr>
+		<th>Node</th>
+		<th>Date</th>
+		<th>s1</th>
+		<th>s2</th>
+		<th>s3</th>
+		<th>s4</th>
+		<th>l1</th>
+		<th>l2</th>
+		<th>omm</th>
+		<th>health</th>
+	</tr>
+</thead>
+	<tbody>
+	{% for x in node_list %}	
+	<tr>
+		<td><a href="/benchmarks/nodes/{{ x.node_name }}/{{x.id}}">{{x.node_name}}</a></td>
+		<td>{{x.test_date}}</td>
+		{% for y in x.node_test.all %}
+		<td>{{ y.value }}</td>
+		{% endfor %}
+	</tr>	
+	{% endfor %}	
+	</tbody>
+</table>
+</div>
+{% else %}
+<div>
+    <p>No data found.</p>
+</div>
+{% endif %}	
+
+
+
 
 
 {% endblock %}

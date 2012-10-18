@@ -8,26 +8,50 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 
 from drip.models import NodeTest, Test
+from drip.forms import NodeQueryForm
 
+def node_query(request):
+    data={}
+    form=NodeQueryForm(request.POST or None)
+    data["form"]= form
+    
+    if request.method == 'POST':
+        if form.is_valid(): 
+            node_name=form.cleaned_data['node_name']
+            
+            return HttpResponseRedirect("/benchmarks/nodes/" + node_name) 
+         
+    return render(request,'node_query.html', data)
+    
 
-
-def node_view(request):
+def node_view(request, name):
+    
+    t = NodeTest.objects.select_related().filter(node_name=name).order_by('-test_date')
+    print t
+    paginator = Paginator(t, 100) 
+    print paginator
+    page = request.GET.get('page')
+    try:
+        objects = paginator.page(page)
+    except PageNotAnInteger:
+        objects = paginator.page(1)
+    except EmptyPage:
+        objects = paginator.page(paginator.num_pages)
+    
+    data = {}
+    print objects
+    data["node_list"] = objects
+         
+    return render(request,'node_view.html', data)
+    
+   
+    
+def node_detail_view(request, name, node_test_id):
     
     data={}
-    
-    t = NodeTest.objects.select_related().all()[0]
-    print t.id
-    print dir(t)
-    print t.node_name
-    print t.test_date
-    d = Test.objects.select_related().filter(node_test=t)
-    for x in d:
-        print x.test_name + " " + str(x.value) + " " 
+    t = NodeTest.objects.select_related().filter(id=node_test_id)
+    print t
+    data["node"] = t
+    data["name"] = name
 
-    t = NodeTest.objects.select_related().all()[0]
-    print t.node_test.all()
-
-
-
-
-    return render_to_response('node_view.html',data, context_instance=RequestContext(request))
+    return render(request,'node_view_detail.html',data)
