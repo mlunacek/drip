@@ -6,12 +6,12 @@ from datetime import datetime
 from optparse import OptionParser
 
 appsdir = '/root/srv/www/benchmarks/apps/'
-appsdir = '/Users/mlunacek/Sites/performance/benchmarks_2.0/apps/'
+#appsdir = '/Users/mlunacek/Sites/performance/benchmarks_2.0/apps/'
 if not appsdir in sys.path:
     sys.path.insert(0,appsdir)
     
 appsdir = '/root/srv/www/benchmarks/'
-appsdir = '/Users/mlunacek/Sites/performance/benchmarks_2.0/'
+#appsdir = '/Users/mlunacek/Sites/performance/benchmarks_2.0/'
 if not appsdir in sys.path:
     sys.path.insert(1,appsdir)    
 
@@ -74,9 +74,18 @@ def direct(input_file):
     config.read(input_file)
     
     node_name = config.get('meta', 'node_name')
-     
+    date_str = config.get('meta', 'date_string')
+    
+    d_year = int(date_str[:4])
+    d_month = int(date_str[4:6])
+    d_day = int(date_str[6:8])
+    d_hour = int(date_str[9:11])
+    d_min = int(date_str[12:14])
+       
+    dt = datetime(year=d_year, month=d_month, day=d_day, hour=d_hour, minute=d_min)
+    
     # Create the node test 
-    test_node_i = NodeTest(node_name=node_name,test_date=datetime.now())
+    test_node_i = NodeTest(node_name=node_name,test_date=dt)
     try:
         test_node_i.save()
     except IntegrityError as e:
