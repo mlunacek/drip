@@ -1,5 +1,7 @@
 
 {% extends "base.html" %}
+
+
 {% block title %}Summary{% endblock %}
 
 {% block current_date %} {{current_date.p}} {% endblock %}
@@ -7,10 +9,51 @@
 {% block content %}
 
 <form action="" method="post">{% csrf_token %}
-{{ form }}
-<p><input type="submit" class="btn" value="get data" /></p>
+	<p><label>Node name</label> {{ form.node_name }} </p>
+	<p>{{ form.node_name.errors }}</p>
+	<div class="well">	
+	
+	<div class="input-append date" id="dp3" data-date="2012-10-13" data-date-format="yyyy-mm-dd">	
+	 <label>Date and Time</label>
+	 {{ form.date }}
+	 <span class="add-on"><i class="icon-th"></i></span>
+	 {{ form.date.errors }}
+	</div>	
+    <div class="input-append bootstrap-timepicker-component">
+    {{ form.time }}
+    <span class="add-on"><i class="icon-time"></i></span>
+    {{ form.time.errors }}
+    </div>
+	</div>
+<p>
+<input type="submit" class="btn" value="get data" />
+</p>
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
+
+
+
+ <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-datepicker.js"></script>
+ <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-timepicker.js"></script>
+<script type="text/javascript">
+	$(function(){
+		
+		$('#dp3').datepicker();
+		$('#dp1').datepicker();
+	
+	});
+	
+    $(document).ready(function () { 
+        $('.timepicker-default').timepicker({
+        	showSeconds: false,
+			minuteStep: 20,
+			disableFocus: true,
+			defaultTime: false
+        });
+    });
+	
+</script>
+
 
 {% endblock %}
 

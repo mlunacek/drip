@@ -10,12 +10,12 @@ TEST_CHOICES = (
     ('s4', 'stream4'),
     ('l1', 'linpack1'),
     ('l2', 'linpack2'),
-    ('omm_passed', 'omm_passed'),
+    ('om', 'omm_passed'),
     ('ib_present', 'ib_present'),
     ('ib_state', 'ib_state'),
     ('ib_link', 'ib_link'),
     ('ib_rate', 'ib_rate'),
-    ('health_check_passed', 'health_check_passed'),
+    ('hc', 'health_check_passed'),
 )    
 
 class NodeTest(models.Model):
@@ -34,7 +34,7 @@ class NodeTest(models.Model):
         unique_together = ('node_name', 'test_date')
     
 class Test(models.Model):
-    test_name = models.CharField(max_length=2, choices=TEST_CHOICES)   
+    test_name = models.CharField(max_length=60, choices=TEST_CHOICES)   
     value = models.FloatField(null=True, blank=True) 
     node_test = models.ForeignKey(NodeTest, related_name='node_test')
     

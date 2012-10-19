@@ -5,12 +5,23 @@
 {% block current_date %} {{current_date.p}} {% endblock %}
 
 {% block content %}
-<p>
-<a class="btn" href="{% url node_query %}"> query again </a>
-</p>
+
+{% if breadcrumb %}
+<ul class="breadcrumb">
+    {% for x in breadcrumb %}
+	{% if forloop.last %}
+	<li class="active">{{x.name}}</li>
+	{% elif forloop.first %} 
+	<li><a href="/benchmarks/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
+	{% else %}
+	<li class="hidden-phone"><a href="/benchmarks/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
+	{% endif %}
+	{% endfor %}
+</ul>  	
+{% endif %}	
+
+
 {% if node_list %}
-
-
 <div class="pagination">
   <ul id="pagination-menu">
 	<li><a href="?page={{1}}">First</a></li>
@@ -21,7 +32,6 @@
   <span id="pagination-text">Page {{ node_list.number }} of {{ node_list.paginator.num_pages }}</span>
 </div>
 
-
 <h3> Node List </h3>
 <div id="node_summary_table">
 <table class="table table-condensed table-striped">
@@ -29,23 +39,23 @@
 	<tr>
 		<th>Node</th>
 		<th>Date</th>
-		<th>s1</th>
-		<th>s2</th>
-		<th>s3</th>
-		<th>s4</th>
-		<th>l1</th>
-		<th>l2</th>
-		<th>omm</th>
-		<th>health</th>
+		<th class="hidden-phone">s1</th>
+		<th class="hidden-phone">s2</th>
+		<th class="hidden-phone">s3</th>
+		<th class="hidden-phone">s4</th>
+		<th class="hidden-phone">l1</th>
+		<th class="hidden-phone">l2</th>
+		<th class="hidden-phone">omm</th>
+		<th class="hidden-phone">health</th>
 	</tr>
 </thead>
 	<tbody>
 	{% for x in node_list %}	
 	<tr>
-		<td><a href="/benchmarks/nodes/{{ x.node_name }}/{{x.id}}">{{x.node_name}}</a></td>
+		<td><a href="/benchmarks/nodes/{{ x.node_name }}/detail/{{x.id}}">{{x.node_name}}</a></td>
 		<td>{{x.test_date}}</td>
 		{% for y in x.node_test.all %}
-		<td>{{ y.value }}</td>
+		<td class="hidden-phone">{{ y.value }}</td>
 		{% endfor %}
 	</tr>	
 	{% endfor %}	
