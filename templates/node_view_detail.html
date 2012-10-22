@@ -7,7 +7,7 @@
 {% block content %}
 
 {% if breadcrumb %}
-<ul class="breadcrumb">
+<ul class="breadcrumb well">
     {% for x in breadcrumb %}
 	{% if forloop.last %}
 	<li class="active">{{x.name}}</li>
@@ -25,7 +25,7 @@
 {% for x in node.all %}	
 <h3> {{x.node_name}}</h3>
 <div id="node_detail_table">
-<table class="table table-condensed table-striped">
+<table class="well table table-condensed table-striped">
     <tbody>	
 		<tr><td>Date</td><td>{{x.test_date}}</td></tr>
 		{% for y in x.node_test.all %}

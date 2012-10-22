@@ -58,7 +58,7 @@ def create_test(config,test_node,section,value):
         if xdatatmp:
             xdata = 1.0
         else:
-            xdata - 0.0
+            xdata = 0.0
     print xdata
     
     test_x = Test(test_name=value, value=xdata, node_test=test_node)
@@ -97,8 +97,8 @@ def direct(input_file):
     create_test(config,test_node_i,'stream','s4')
     create_test(config,test_node_i,'linpack','l1')
     create_test(config,test_node_i,'linpack','l2')
-    create_test(config,test_node_i,'meta','omm_passed')
-    create_test(config,test_node_i,'meta','health_check_passed')
+    create_test(config,test_node_i,'meta','om')
+    create_test(config,test_node_i,'meta','hc')
 
 #==============================================================================  
 if __name__ == '__main__':      

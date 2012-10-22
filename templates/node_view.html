@@ -7,7 +7,7 @@
 {% block content %}
 
 {% if breadcrumb %}
-<ul class="breadcrumb">
+<ul class="breadcrumb well">
     {% for x in breadcrumb %}
 	{% if forloop.last %}
 	<li class="active">{{x.name}}</li>
@@ -22,7 +22,7 @@
 
 
 {% if node_list %}
-<div class="pagination">
+<div class="pagination well">
   <ul id="pagination-menu">
 	<li><a href="?page={{1}}">First</a></li>
     <li><a href="?page={{ node_list.previous_page_number }}"><</a></li>
@@ -32,9 +32,8 @@
   <span id="pagination-text">Page {{ node_list.number }} of {{ node_list.paginator.num_pages }}</span>
 </div>
 
-<h3> Node List </h3>
 <div id="node_summary_table">
-<table class="table table-condensed table-striped">
+<table class="well table table-condensed table-striped">
 <thead>
 	<tr>
 		<th>Node</th>
