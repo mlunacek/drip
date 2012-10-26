@@ -12,9 +12,9 @@
 	{% if forloop.last %}
 	<li class="active">{{x.name}}</li>
 	{% elif forloop.first %} 
-	<li><a href="/benchmarks/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
+	<li><a href="/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
 	{% else %}
-	<li class="hidden-phone"><a href="/benchmarks/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
+	<li class="hidden-phone"><a href="/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
 	{% endif %}
 	{% endfor %}
 </ul>  	
@@ -27,9 +27,21 @@
 <div id="node_detail_table">
 <table class="well table table-condensed table-striped">
     <tbody>	
-		<tr><td>Date</td><td>{{x.test_date}}</td></tr>
+		<tr>
+			<td>Date</td>
+			<td>{{x.job.start_time}}</td>
+			<td>Pass/Fail</td>
+		</tr>
 		{% for y in x.node_test.all %}
-		<tr><td>{{ y.test_name }}</td><td>{{y.value}}</td></tr>
+		<tr>
+			<td>{{ y.test_name }}</td>
+			<td>{{y.value}}</td>
+			{% if y.passed %}
+			<td class="passed"></td>
+			{% else %}
+			<td class="failed"></td>
+			{% endif %}
+		</tr>
 		{% endfor %}
 	</tbody>
 </table>

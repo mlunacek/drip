@@ -1,0 +1,95 @@
+
+{% extends "base.html" %}
+{% block title %}Summary{% endblock %}
+
+{% block current_date %} {{current_date.p}} {% endblock %}
+
+{% block content %}
+
+{% if breadcrumb %}
+<ul class="breadcrumb well">
+    {% for x in breadcrumb %}
+	{% if forloop.last %}
+	<li class="active">{{x.name}}</li>
+	{% elif forloop.first %} 
+	<li><a href="/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
+	{% else %}
+	<li ><a href="/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
+	{% endif %}
+	{% endfor %}
+</ul>  	
+{% endif %}	
+
+
+{% if before %}
+
+
+<table class="well table table-condensed table-striped">
+<thead>
+	<tr>
+		<th>Node</th>
+		<th>Time</th>
+		<th class="hidden-phone">s1</th>
+		<th class="hidden-phone">s2</th>
+	</tr>
+</thead>
+	<tbody>
+	{% for x in before %}	
+	<tr>
+		<td><a href="/benchmarks/jobs/{{username}}/{{job_id}}/{{x.id}}">{{x.node_name}}</a></td>
+		<td>{{x.job.start_time.time}}</td>
+		{% for y in x.node_test.all %}
+		{% if y.passed %}
+		<td class="passed"></td>
+		{% else %}
+		<td class="failed"></td>
+		{% endif %}
+		{% endfor %}
+	</tr>	
+	{% endfor %}	
+</tbody>
+</table>
+
+	
+<table class="well table table-condensed table-striped">
+<thead>
+	<tr>
+		<th>Node</th>
+		<th>Time</th>
+		<th class="hidden-phone">s1</th>
+		<th class="hidden-phone">s2</th>
+	</tr>
+</thead>	
+</thead>
+	<tbody>	
+	{% for x in after %}	
+	<tr>
+		<td><a href="/benchmarks/nodes/{{ x.node_name }}/detail/{{x.id}}">{{x.node_name}}</a></td>
+		<td >{{x.job.start_time.time}}</td>
+		{% for y in x.node_test.all %}
+		{% if y.passed %}
+		<td class="passed"></td>
+		{% else %}
+		<td class="failed"></td>
+		{% endif %}
+		
+		{% endfor %}
+	</tr>	
+	{% endfor %}	
+</tbody>
+</table>
+
+{% else %}
+<div>
+    <p>No data found.</p>
+</div>
+{% endif %}	
+
+
+
+
+
+{% endblock %}
+
+
+

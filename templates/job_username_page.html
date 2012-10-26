@@ -1,0 +1,60 @@
+
+{% extends "base.html" %}
+{% block title %}Summary{% endblock %}
+
+{% block current_date %} {{current_date.p}} {% endblock %}
+
+{% block content %}
+
+{% if breadcrumb %}
+<ul class="breadcrumb well">
+    {% for x in breadcrumb %}
+	{% if forloop.last %}
+	<li class="active">{{x.name}}</li>
+	{% elif forloop.first %} 
+	<li><a href="/benchmarks/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
+	{% else %}
+	<li class="hidden-phone"><a href="/benchmarks/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
+	{% endif %}
+	{% endfor %}
+</ul>  	
+{% endif %}	
+
+
+{% if job_list %}
+
+<div id="node_summary_table">
+<table class="well table table-condensed table-striped">
+<thead>
+	<tr>
+		<th>Job ID</th>
+		<th>Date</th>
+	    <th>Start Time</th>
+	</tr>
+</thead>
+	<tbody>
+	{% for x in job_list %}	
+	<tr>
+		<td><a href="/benchmarks/jobs/{{ username}}/{{x.job_id}}">{{x.job_id}}</a></td>
+		<td>{{x.start_time.date}}</td>
+		<td>{{x.start_time.time}}</td>
+	</tr>	
+	{% endfor %}	
+	
+</tbody>
+</table>
+</div>
+{% else %}
+<div>
+    <p>No data found.</p>
+</div>
+{% endif %}	
+
+
+
+
+
+{% endblock %}
+
+
+

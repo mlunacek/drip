@@ -1,0 +1,86 @@
+
+{% extends "base.html" %}
+{% block title %}Summary{% endblock %}
+
+{% block current_date %} {{current_date.p}} {% endblock %}
+
+{% block content %}
+
+{% if breadcrumb %}
+<ul class="breadcrumb well">
+    {% for x in breadcrumb %}
+	{% if forloop.last %}
+	<li class="active">{{x.name}}</li>
+	{% elif forloop.first %} 
+	<li><a href="/benchmarks/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
+	{% else %}
+	<li class="hidden-phone"><a href="/benchmarks/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
+	{% endif %}
+	{% endfor %}
+</ul>  	
+{% endif %}	
+
+
+{% if before %}
+
+<div id="node_summary_table">
+<table class="well table table-condensed table-striped">
+<thead>
+	<tr>
+		<th>Node</th>
+		<th class="hidden-phone">Date</th>
+		<th class="hidden-phone">s1</th>
+		<th class="hidden-phone">s2</th>
+	</tr>
+</thead>
+	<tbody>
+	{% for x in before %}	
+	<tr>
+		<td><a href="/benchmarks/nodes/{{ x.node_name }}/detail/{{x.id}}">{{x.node_name}}</a></td>
+		<td class="hidden-phone">{{x.job.start_time}}</td>
+		{% for y in x.node_test.all %}
+		{% if y.passed %}
+		<td class="passed"></td>
+		{% else %}
+		<td class="failed"></td>
+		{% endif %}
+		{% endfor %}
+	</tr>	
+	{% endfor %}	
+	<tr>
+	  <td> {{job_id}} </td>	
+	   <td class="hidden-phone"> {{start_time}} </td>	
+	   <td></td>
+	   <td></td>   
+	</tr>	
+	{% for x in after %}	
+	<tr>
+		<td><a href="/benchmarks/nodes/{{ x.node_name }}/detail/{{x.id}}">{{x.node_name}}</a></td>
+		<td class="hidden-phone">{{x.job.start_time}}</td>
+		{% for y in x.node_test.all %}
+		{% if y.passed %}
+		<td class="passed"></td>
+		{% else %}
+		<td class="failed"></td>
+		{% endif %}
+		
+		{% endfor %}
+	</tr>	
+	{% endfor %}	
+</tbody>
+</table>
+</div>
+{% else %}
+<div>
+    <p>No data found.</p>
+</div>
+{% endif %}	
+
+
+
+
+
+{% endblock %}
+
+
+
