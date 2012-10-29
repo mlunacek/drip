@@ -16,6 +16,19 @@ def node_query():
     t = NodeTest.objects.select_related().filter(id__in=test_ids)
     return t
 
+def node_snapshot():
+    current = datetime.now()
+    sql = 'SELECT t.id, t.node_name, j.job_id, max(j.start_time) as max_start_time FROM drip_nodetest AS t, drip_job AS j '
+    sql = sql + 'WHERE j.id = t.job_id AND j.start_time <= "' + str(current) + '" AND j.test_run = 1 ' 
+    sql = sql + 'GROUP BY node_name'
+  
+    test_ids = []
+    for p in NodeTest.objects.raw(sql):
+        test_ids.append(p.id) 
+    
+    t = NodeTest.objects.select_related().filter(id__in=test_ids)
+    return t    
+
 def job_get_username(job_id):
     return "molu8455"
 

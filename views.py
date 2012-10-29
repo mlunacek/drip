@@ -132,7 +132,7 @@ def node_year_month_day_id(request, name, year, month, day, job_id):
     
 
 def node_snapshot(request):
-    t = functions.node_query()
+    t = functions.node_snapshot()
     data = functions.paginator(request, t)
     data["breadcrumb"] = functions.breadcrumb('snapshot')
     return render(request,'node_view.html', data)
