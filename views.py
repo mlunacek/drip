@@ -7,52 +7,87 @@ from django.views.generic import ListView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 
-from drip.models import NodeTest, Test
-from drip.forms import NodeQueryForm
+from drip.models import Job, NodeTest, Test
+from drip.forms import NodeQueryForm, JobIdForm
 
 from datetime import datetime, time
 import functions
 
+''' Job Views '''
+
+def job_query(request):
+    data={}
+    form_job=JobIdForm(request.POST or None, initial={'username': 'molu8455'})
+    data["form_job"]= form_job
+    data["breadcrumb"] = functions.job_breadcrumb()
+   
+    if request.method == 'POST':
+        
+        if form_job.is_valid(): 
+            if form_job.cleaned_data['username']:  
+                username = form_job.cleaned_data['username']
+                link_str = ["/benchmarks/jobs/" + username ]
+                
+            if form_job.cleaned_data['job_id']:
+                job_id=form_job.cleaned_data['job_id']
+                username = functions.job_get_username(job_id)
+                link_str = ["/benchmarks/jobs/" + username ]
+                link_str.append(job_id)
+
+            return HttpResponseRedirect("/".join(link_str))
+         
+    return render(request,'job_query.html', data)
+
+def job_username(request, username):  
+    data = {}
+    data['username'] = username
+    data['job_list'] = functions.job_get_user_ids(username);
+    data["breadcrumb"] = functions.job_breadcrumb(username)
+    return render(request,'job_username_page.html', data)
+
+def job_id(request, username, job_id):  
+    data = functions.job_query(job_id)
+    data['username'] = username
+    data['job_id'] = job_id
+    data["breadcrumb"] = functions.job_breadcrumb(username, job_id)
+    return render(request,'job_id_page.html', data)
+
+def job_id_detail(request, username, job_id, node_test_id):
+    data = {}
+    data["node"]  = NodeTest.objects.select_related().filter(id=node_test_id)
+    data["breadcrumb"] = functions.job_breadcrumb(username, job_id, node_test_id)
+    
+    return render(request,'node_view_detail.html', data)    
+
+
+''' Node Views'''
+
+
 def node_query(request):
     data={}
-    form=NodeQueryForm(request.POST or None, initial={'node_name': 'node1430', 'date':'2012-10-18', 'time':'11:05 PM'})
-    data["form"]= form
+    form_node=NodeQueryForm(request.POST or None, initial={'username': 'molu8455'})
+    data["form_node"]= form_node
     data["breadcrumb"] = functions.breadcrumb()
-    t = NodeTest.objects.select_related().filter(node_name='node1430').order_by('-test_date')
-    print t
-    
-    
+   
     if request.method == 'POST':
-        if form.is_valid(): 
-            node_name=form.cleaned_data['node_name']
-            date_str = form.cleaned_data['date']
-            time_str = form.cleaned_data['time']
-            
+        if form_node.is_valid(): 
+            node_name=form_node.cleaned_data['node_name']
             link_str = ["/benchmarks/nodes"]
             link_str.append(node_name)
-            print link_str 
-            print date_str
+            date_str = form_node.cleaned_data['date']
             if date_str == "":
                 return HttpResponseRedirect("/".join(link_str))     
-            
             d_year = date_str[:4]
             d_month = date_str[5:7]
             d_day = date_str[8:10]
-            d_hour = time_str[:2]
-            d_min = time_str[3:5]
-            d_flip = time_str[6:8]
-            if d_flip == 'PM':
-                d_hour = str(int(d_hour) + 12)
-             
             link_str.append(str(d_year))   
             link_str.append(str(d_month))
-            link_str.append(str(d_day))   
-            link_str.append(str(d_hour))
-            link_str.append(str(d_min))    
-          
+            link_str.append(str(d_day))
+                
             return HttpResponseRedirect("/".join(link_str)) 
          
     return render(request,'node_query.html', data)
+
 
 def node_detail_view(request, name, node_test_id):
     data={}
@@ -87,19 +122,20 @@ def node_year_month_day(request, name, year, month, day):
     data["breadcrumb"] = functions.breadcrumb(name,year,month,day)
     return render(request,'node_view.html', data)
 
-def node_year_month_day_hour(request, name, year, month, day, hour):
-    t = functions.query(name, year, month, day, hour)
-    data = functions.paginator(request, t)
-    data["breadcrumb"] = functions.breadcrumb(name,year,month, day, hour)
-    return render(request,'node_view.html', data)  
-
-def node_year_month_day_time(request, name, year, month, day, hour, mi):
-    t = functions.query(name, year, month, day, hour, mi)
-    data = functions.paginator(request, t)
-    data["breadcrumb"] = functions.breadcrumb(name,year,month, day, hour,mi)
-    return render(request,'node_view.html', data)  
+def node_year_month_day_id(request, name, year, month, day, job_id):
+    data={}
+    t = NodeTest.objects.select_related().filter(id=job_id)
+    print t
+    data["node"] = t
+    data["breadcrumb"] = functions.breadcrumb(name, year, month, day, job_id)
+    return render(request,'node_view_detail.html',data)
     
 
+def node_snapshot(request):
+    t = functions.node_query()
+    data = functions.paginator(request, t)
+    data["breadcrumb"] = functions.breadcrumb('snapshot')
+    return render(request,'node_view.html', data)
     
     
     

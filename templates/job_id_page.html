@@ -31,6 +31,12 @@
 		<th>Time</th>
 		<th class="hidden-phone">s1</th>
 		<th class="hidden-phone">s2</th>
+		<th class="hidden-phone">s3</th>
+		<th class="hidden-phone">s4</th>
+		<th class="hidden-phone">l1</th>
+		<th class="hidden-phone">l2</th>
+		<th class="hidden-phone">Memory</th>
+		<th class="hidden-phone">Health</th>
 	</tr>
 </thead>
 	<tbody>
@@ -49,8 +55,9 @@
 	{% endfor %}	
 </tbody>
 </table>
+{% endif %}	
 
-	
+{% if after %}	
 <table class="well table table-condensed table-striped">
 <thead>
 	<tr>
@@ -58,6 +65,13 @@
 		<th>Time</th>
 		<th class="hidden-phone">s1</th>
 		<th class="hidden-phone">s2</th>
+		<th class="hidden-phone">s3</th>
+		<th class="hidden-phone">s4</th>
+		<th class="hidden-phone">l1</th>
+		<th class="hidden-phone">l2</th>
+		<th class="hidden-phone">Memory</th>
+		<th class="hidden-phone">Health</th>
+		
 	</tr>
 </thead>	
 </thead>
@@ -79,10 +93,6 @@
 </tbody>
 </table>
 
-{% else %}
-<div>
-    <p>No data found.</p>
-</div>
 {% endif %}	
 
 

@@ -3,79 +3,49 @@ import requests
 
 import os, sys, ConfigParser
 from datetime import datetime 
-from optparse import OptionParser
+from optparse import OptionParser 
 
-appsdir = '/root/srv/www/benchmarks/apps/'
+mycwd = os.getcwd()
+mycwd = os.path.split(mycwd)[0]
+appsdir = os.path.split(mycwd)[0]
+
+#appsdir = '/root/srv/www/benchmarks/apps/'
 #appsdir = '/Users/mlunacek/Sites/performance/benchmarks_2.0/apps/'
 if not appsdir in sys.path:
     sys.path.insert(0,appsdir)
+
+appsdir = os.path.split(appsdir)[0]
     
-appsdir = '/root/srv/www/benchmarks/'
+#appsdir = '/root/srv/www/benchmarks/'
 #appsdir = '/Users/mlunacek/Sites/performance/benchmarks_2.0/'
 if not appsdir in sys.path:
     sys.path.insert(1,appsdir)    
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "benchmarks_site.settings"
 from django.db import models
-from drip.models import NodeTest, Test
+from drip.models import Job, NodeTest, Test
 from django.db import IntegrityError
 
-def crud(nodename):
-    r = requests.get('http://127.0.0.1:8000/benchmarks/api/node/json/')
-    if r.status_code != 200:
-        print r.raise_for_status()
-
-
-    # Here are a few templates
-    tmp = json.dumps([{
-        "test_date": "2012-10-16T13:57:44", 
-        "node_name": nodename,
-        "node_test":[ { "value": 111.0, "test_name": "s1" }, 
-                      { "value": 222.0, "test_name": "s2" }, 
-                      { "value": 222.0, "test_name": "s3" }, 
-                      { "value": 222.0, "test_name": "s4" }, 
-                      { "value": 222.0, "test_name": "l1" }, 
-                      { "value": 222.0, "test_name": "l2" }
-                    ]
-                    }])
-
-    r = requests.post('http://127.0.0.1:8000/benchmarks/api/node/json/',
-                     data=tmp,
-                     headers={'content-type': 'application/json'})
-    if r.status_code == 201:
-        print r.content   
-    elif r.status_code == 409:
-        print "Conflict"
-    else:
-        print r.raise_for_status()
-
-def create_test(config,test_node,section,value):
+def create_test(config,test_node,section,name,threshold):
     
     try:
-        xdata = config.getfloat(section, value)
-    except ValueError as e:
-        xdatatmp = config.getboolean(section, value)
-        if xdatatmp:
-            xdata = 1.0
-        else:
-            xdata = 0.0
-    print xdata
-    
-    test_x = Test(test_name=value, value=xdata, node_test=test_node)
-    try:
-        test_x.save()
-    except IntegrityError as e:
-        print "Integrity Error"
+        xdata = config.getfloat(section, name)
+        passed = True
+        if xdata < threshold:
+            passed = False
+            
+        test_x = Test(test_name=name, value=xdata, node_test=test_node, threshold=threshold, passed=passed)
+        try:
+            test_x.save()
+        except IntegrityError as e:
+            pass
 
+    except ConfigParser.NoOptionError:
+        print "no options"
+    except ConfigParser.NoSectionError:
+        print "no sections"            
 
-def direct(input_file):
-    
-    config = ConfigParser.ConfigParser()
-    config.read(input_file)
-    
-    node_name = config.get('meta', 'node_name')
-    date_str = config.get('meta', 'date_string')
-    
+def date_string(date_str):
     d_year = int(date_str[:4])
     d_month = int(date_str[4:6])
     d_day = int(date_str[6:8])
@@ -83,22 +53,91 @@ def direct(input_file):
     d_min = int(date_str[12:14])
        
     dt = datetime(year=d_year, month=d_month, day=d_day, hour=d_hour, minute=d_min)
+    return dt
     
-    # Create the node test 
-    test_node_i = NodeTest(node_name=node_name,test_date=dt)
+def create_or_get_job(config):
+    # Job info
+    job_id_tmp = config.get('pbs', 'job_id')
+    job_id = job_id_tmp.split('.')[0]
+    user_name = config.get('pbs', 'job_user')
+    job_name = config.get('pbs', 'job_name')[:60]
+    start_date = config.get('script', 'date')    
+    sd = date_string(start_date)
+    
+    print job_id
+    print job_name
+    print user_name
+    print sd
+    
+    testrun = True
     try:
-        test_node_i.save()
-    except IntegrityError as e:
-	    print "Integrity Error"
+        name = config.get('Benchmarks', 'name')
+    except ConfigParser.NoSectionError:    
+        print "no section"
+        testrun = False
     
-    create_test(config,test_node_i,'stream','s1')
-    create_test(config,test_node_i,'stream','s2')
-    create_test(config,test_node_i,'stream','s3')
-    create_test(config,test_node_i,'stream','s4')
-    create_test(config,test_node_i,'linpack','l1')
-    create_test(config,test_node_i,'linpack','l2')
-    create_test(config,test_node_i,'meta','om')
-    create_test(config,test_node_i,'meta','hc')
+    # Create the Job or get the job if it's already there
+    job = Job(job_id=job_id, user_name=user_name, job_name=job_name, start_time=sd, test_run=testrun)
+    try:
+        job.save()
+    except IntegrityError as e:
+        job = Job.objects.filter(job_id=job_id)[0:1].get()
+    
+    script_type = config.get('script', 'type')
+    print script_type
+    if script_type == 'epilogue':
+        resources = config.get('pbs', 'job_resources') 
+        job.resources = resources
+        job.save()
+    
+    return job        
+    
+def create_or_get_node_test(config, job):
+    
+    try:
+        node_name = config.get('health', 'node_name')
+        start_date = config.get('script', 'date') 
+        sd = date_string(start_date)
+    
+        # Create the node test
+        node_test = NodeTest(job=job, node_name=node_name, start_time=sd)
+        try:
+            node_test.save()
+        except IntegrityError as e:
+            node_test = NodeTest.objects.filter(job=job, node_name=node_name)[0:1].get()   
+
+    except ConfigParser.NoOptionError:
+        return None
+    except ConfigParser.NoSectionError:
+        return None    
+    
+    return node_test     
+
+def direct(input_file):
+    
+    config = ConfigParser.ConfigParser()
+    config.read(input_file)
+    
+    # Job info
+    job = create_or_get_job(config)
+
+    # Node Test
+    node_test = create_or_get_node_test(config, job)
+    
+    print job.job_id    
+    if node_test:
+        
+        print node_test.node_name
+    
+        create_test(config,node_test,'Benchmarks','stream_copy', 23000)
+        create_test(config,node_test,'Benchmarks','stream_scale', 36000)
+        create_test(config,node_test,'Benchmarks','stream_add', 36000)
+        create_test(config,node_test,'Benchmarks','stream_trial', 37000)
+        create_test(config,node_test,'Benchmarks','linpack_5k', 90)
+        create_test(config,node_test,'Benchmarks','linpack_10k', 100)
+        create_test(config,node_test,'health','oom', 0.5)
+        create_test(config,node_test,'health','hc', 0.5)
+
 
 #==============================================================================  
 if __name__ == '__main__':      
@@ -111,7 +150,6 @@ if __name__ == '__main__':
     # get the options
     if options.file:
     	input_file = options.file
-        #crud("node1023")
         direct(input_file)
 
 

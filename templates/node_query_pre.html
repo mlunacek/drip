@@ -15,9 +15,9 @@
 	{% if forloop.last %}
 	<li class="active">{{x.name}}</li>
 	{% elif forloop.first %} 
-	<li><a href="/benchmarks/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
+	<li><a href="/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
 	{% else %}
-	<li class="hidden-phone"><a href="/benchmarks/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
+	<li class="hidden-phone"><a href="/{{ x.link }}/">{{x.name}}</a> <span class="divider">/</span></li>
 	{% endif %}
 	{% endfor %}
 </ul>  	

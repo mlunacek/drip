@@ -3,27 +3,21 @@ from piston.handler import BaseHandler
 from piston.utils import rc
 from django.db import IntegrityError
 
-TEST_CHOICES = (
-    ('s1', 'stream1'),
-    ('s2', 'stream2'),
-    ('s3', 'stream3'),
-    ('s4', 'stream4'),
-    ('l1', 'linpack1'),
-    ('l2', 'linpack2'),
-    ('om', 'omm_passed'),
-    ('ib_present', 'ib_present'),
-    ('ib_state', 'ib_state'),
-    ('ib_link', 'ib_link'),
-    ('ib_rate', 'ib_rate'),
-    ('hc', 'health_check_passed'),
-)    
+class Job(models.Model):
+    job_id = models.CharField(max_length=60, unique=True)
+    user_name = models.CharField(max_length=60)
+    job_name = models.CharField(max_length=60)
+    start_time = models.DateTimeField(db_index=True)
+    resources = models.CharField(max_length=120,null=True, blank=True)
+    test_run = models.BooleanField()
 
 class NodeTest(models.Model):
+    job = models.ForeignKey(Job, related_name='job')
     node_name = models.CharField(max_length=8)
-    test_date = models.DateTimeField(db_index=True)
-    
+    start_time = models.DateTimeField(db_index=True)
+        
     def __unicode__(self):
-        return self.node_name + " " + str(self.test_date)
+        return self.job.job_id + " " + self.node_name
     
     def test_string(self):
         qs = self.node_test.all().order_by('test_name')
@@ -31,17 +25,22 @@ class NodeTest(models.Model):
         return ", ".join(strlist)
         
     class Meta:
-        unique_together = ('node_name', 'test_date')
+        unique_together = ('job', 'node_name')
     
 class Test(models.Model):
-    test_name = models.CharField(max_length=60, choices=TEST_CHOICES)   
-    value = models.FloatField(null=True, blank=True) 
     node_test = models.ForeignKey(NodeTest, related_name='node_test')
+    test_name = models.CharField(max_length=60)   
+    value = models.FloatField(null=True, blank=True) 
+    threshold = models.FloatField(null=True, blank=True) 
+    passed = models.NullBooleanField()
     
     def __unicode__(self):
             return self.test_name
-      
-      
+    
+    class Meta:
+        unique_together = ('node_test', 'test_name')
+
+ 
 class NodeTestHandler(BaseHandler):
    
    allowed_methods = ('GET','PUT','POST',)

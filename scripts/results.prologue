@@ -1,0 +1,42 @@
+ 
+[script]
+name           = /curc/torque/nodes/node1354/mom_priv/prologue
+type           = prologue
+date           = 20121029:11:06:25
+ 
+[pbs]
+job_id         = 1475844.moab.rc.colorado.edu
+job_user       = molu8455
+job_group      = molu8455pgrp
+job_name       = example
+job_limits     = neednodes=node1354:ppn=12+node0348:ppn=12+node1567:ppn=12,nodes=node1354:ppn=12+node0348:ppn=12+node1567:ppn=12,walltime=00:10:00
+job_queue      = janus-admin
+job_account    = 
+
+ 
+[health]
+name           = /curc/admin/benchmarks/django/benchmarks/apps/drip/scripts/health_script.sh
+node_name      = node1354
+ib_present     = 1.0
+mem_total      = 24675680
+dimm_count     = 6
+dimm_speed     = 1333
+cpu_bios_speed = 2800
+ib_rate        = 40
+ib_rate_def    = 40
+ib_delta       = 0
+ib_delta_def   = 16
+ib_diagsum     = 0
+ib_diagsum_def = 256
+oom            = 1.0
+hc             = 1.0
+
+[Benchmarks]
+name           = /curc/admin/benchmarks/django/benchmarks/apps/drip/scripts/benchmark_script.sh
+stream_copy    =  26857
+stream_scale   =  40275
+stream_add     =  41992
+stream_trial   =  42316
+linpack_5k     =  107
+linpack_10k    =  115
+

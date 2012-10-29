@@ -1,0 +1,16 @@
+ 
+[script]
+name           = /curc/torque/nodes/node1354/mom_priv/prologue
+type           = prologue
+date           = 20121029:11:06:25
+ 
+[pbs]
+job_id         = 1475844.moab.rc.colorado.edu
+job_user       = molu8455
+job_group      = molu8455pgrp
+job_name       = example
+job_limits     = neednodes=node1354:ppn=12+node0348:ppn=12+node1567:ppn=12,nodes=node1354:ppn=12+node0348:ppn=12+node1567:ppn=12,walltime=00:10:00
+job_queue      = janus-admin
+job_account    = 
+
+
