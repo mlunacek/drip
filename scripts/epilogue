@@ -66,7 +66,7 @@ if [[ $8 = janus-small || $8 = janus-normal || $8 = janus-wide || $8 = janus-jum
   
     . /curc/tools/utils/dkinit
     reuse Benchmarks
-    #python /curc/admin/benchmarks/django/benchmarks/apps/drip/scripts/load_data.py -f /tmp/diagnose/results > /tmp/diagnose/output 
+    python /curc/admin/benchmarks/django/benchmarks/apps/drip/scripts/load_data.py -f $tmp_dir/$tmp_file > /tmp/diagnose/output 
 fi
 
 
