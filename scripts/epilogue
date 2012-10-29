@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# kills any user processes that are still running on the node after a job
+# finishes.  Runs as root on all Sisters after user epilogue has finished.
+# PAR - 5/31/2012
+
+# Note - in Torque 4.0 epilogue.parallel runs "as the user" which means
+# the pkill will have to be modified to avoid killing the epilogue script.
+#  (Check this - may have changed or documentation may have been fixed.)
+
+# These variables are available from torque to the epilogue processes:
+# argv[1] 	job id
+# argv[2] 	job execution user name
+# argv[3] 	job execution group name
+# argv[4] 	job name
+# argv[5] 	session id
+# argv[6] 	list of requested resource limits
+# argv[7] 	list of resources used by job
+# argv[8] 	job execution queue
+# argv[9] 	job account
+# argv[10] 	job exit code
+
+# make sure we're on a non-shared queue:
+if [[ $8 = janus-small || $8 = janus-normal || $8 = janus-wide || $8 = janus-jumbo || $8 = janus-admin ]]; then
+  # wait just a bit to let legit user processes finish.
+  /bin/sleep 10 
+  # kill user's remaining processes; redirect output to syslog to
+  # avoid confusing lines in users's output/error files.
+  #/usr/bin/pkill -9 -u $2 | /bin/logger >/dev/null 2>&1
+fi
+
+# Run the benchmarks script
+if [[ $8 = janus-small || $8 = janus-normal || $8 = janus-wide || $8 = janus-jumbo || $8 = janus-admin ]]; then
+    
+	echo "epilogue  = "`eval date +%H:%M:%S` >> /home/molu8455/projects/diagnose/output
+	
+	tmp_dir='/tmp/diagnose'
+    tmp_file='results.epilogue'
+	
+    mkdir -p $tmp_dir
+    echo " " > $tmp_dir/$tmp_file
+    echo "[script]" >> $tmp_dir/$tmp_file
+    
+    echo "name           = $0" >> $tmp_dir/$tmp_file
+	echo "type           = epilogue" >> $tmp_dir/$tmp_file
+    echo "date           = "`eval date +%Y%m%d":"%H:%M:%S` >> $tmp_dir/$tmp_file
+
+    echo " " >> $tmp_dir/$tmp_file
+    echo "[pbs]" >> $tmp_dir/$tmp_file
+    echo "job_id         = $1" >> $tmp_dir/$tmp_file
+    echo "job_user       = $2" >> $tmp_dir/$tmp_file
+    echo "job_group      = $3" >> $tmp_dir/$tmp_file
+    echo "job_name       = $4" >> $tmp_dir/$tmp_file
+    echo "job_session_id = $5" >> $tmp_dir/$tmp_file
+    echo "job_limits     = $6" >> $tmp_dir/$tmp_file
+    echo "job_resources  = $7" >> $tmp_dir/$tmp_file
+    echo "job_queue      = $8" >> $tmp_dir/$tmp_file
+	echo "job_account    = $9" >> $tmp_dir/$tmp_file
+	echo "job_exit_code  = $10" >> $tmp_dir/$tmp_file
+  
+  
+    /curc/admin/benchmarks/django/benchmarks/apps/drip/scripts/health_script.sh $tmp_dir $tmp_file
+    /curc/admin/benchmarks/django/benchmarks/apps/drip/scripts/benchmark_script.sh $tmp_dir $tmp_file
+  
+    echo "epilogue done = "`eval date +%H:%M:%S` >> /home/molu8455/projects/diagnose/output
+  
+    . /curc/tools/utils/dkinit
+    reuse Benchmarks
+    #python /curc/admin/benchmarks/django/benchmarks/apps/drip/scripts/load_data.py -f /tmp/diagnose/results > /tmp/diagnose/output 
+fi
+
+
+
+
+
+

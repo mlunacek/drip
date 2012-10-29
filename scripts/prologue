@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# These variables are available from torque to the prologue processes:
+#argv[1]	job id
+#argv[2]	job execution user name
+#argv[3]	job execution group name
+#argv[4]	job name (TORQUE 1.2.0p4 and higher only)
+#argv[5]	list of requested resource limits (TORQUE 1.2.0p4 and higher only)
+#argv[6]	job execution queue (TORQUE 1.2.0p4 and higher only)
+#argv[7]	job account (TORQUE 1.2.0p4 and higher only)
+
+
+# Run the benchmarks script
+if [[ $6 = janus-small || $6 = janus-normal || $6 = janus-wide || $6 = janus-jumbo || $6 = janus-admin ]]; then
+
+  echo "prologue  = "`eval date +%H:%M:%S` >> /home/molu8455/projects/diagnose/output
+
+  tmp_dir='/tmp/diagnose'
+  tmp_file='results.prologue'
+
+  mkdir -p $tmp_dir
+  echo " " > $tmp_dir/$tmp_file
+  echo "[script]" >> $tmp_dir/$tmp_file
+  echo "name           = $0" >> $tmp_dir/$tmp_file
+  echo "type           = prologue" >> $tmp_dir/$tmp_file
+  echo "date           = "`eval date +%Y%m%d":"%H:%M:%S` >> $tmp_dir/$tmp_file
+
+  echo " " >> $tmp_dir/$tmp_file
+  echo "[pbs]" >> $tmp_dir/$tmp_file
+  echo "job_id         = $1" >> $tmp_dir/$tmp_file
+  echo "job_user       = $2" >> $tmp_dir/$tmp_file
+  echo "job_group      = $3" >> $tmp_dir/$tmp_file
+  echo "job_name       = $4" >> $tmp_dir/$tmp_file
+  echo "job_limits     = $5" >> $tmp_dir/$tmp_file
+  echo "job_queue      = $6" >> $tmp_dir/$tmp_file
+  echo "job_account    = $7" >> $tmp_dir/$tmp_file
+  
+  /curc/admin/benchmarks/django/benchmarks/apps/drip/scripts/health_script.sh $tmp_dir $tmp_file
+  /curc/admin/benchmarks/django/benchmarks/apps/drip/scripts/benchmark_script.sh $tmp_dir $tmp_file
+  
+  echo "prologue done = "`eval date +%H:%M:%S` >> /home/molu8455/projects/diagnose/output
+  
+  . /curc/tools/utils/dkinit
+  reuse Benchmarks
+  #python /curc/admin/benchmarks/django/benchmarks/apps/drip/scripts/load_data.py -f /tmp/diagnose/results > /tmp/diagnose/output 
+
+fi
+
+
+
+
+
+
