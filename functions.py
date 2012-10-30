@@ -2,6 +2,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from drip.models import Job, NodeTest, Test
 from datetime import datetime, time
+from django.db.models import Sum
+
 
 def node_query():
     current = datetime.now()
@@ -15,12 +17,26 @@ def node_query():
     
     t = NodeTest.objects.select_related().filter(id__in=test_ids)
     return t
+    
+def node_snapshot():
+    current = datetime.now()
+    sql = 'SELECT t.id, t.node_name, j.job_id, max(j.start_time) as max_start_time FROM drip_nodetest AS t, drip_job AS j '
+    sql = sql + 'WHERE j.id = t.job_id AND j.start_time <= "' + str(current) + '" AND j.test_run = 1 ' 
+    sql = sql + 'GROUP BY node_name'
+    print sql
+    test_ids = []
+    for p in NodeTest.objects.raw(sql):
+        test_ids.append(p.id) 
+    
+    t = NodeTest.objects.select_related().filter(id__in=test_ids).annotate(num_errors=Sum('node_test__passed')).order_by('num_errors')
+       
+    return t    
 
 def job_get_username(job_id):
     return "molu8455"
 
 def job_get_user_ids(username):
-    jobs = Job.objects.filter(user_name=username)
+    jobs = Job.objects.filter(user_name=username).order_by('-start_time')
     return jobs
 
 def job_query_before(st, node_list, job_id):

@@ -28,6 +28,7 @@
 <thead>
 	<tr>
 		<th>Job ID</th>
+		<th>Job Name</th>
 		<th>Date</th>
 	    <th>Start Time</th>
 	</tr>
@@ -36,6 +37,7 @@
 	{% for x in job_list %}	
 	<tr>
 		<td><a href="/benchmarks/jobs/{{ username}}/{{x.job_id}}">{{x.job_id}}</a></td>
+		<td><a href="/benchmarks/jobs/{{ username}}/{{x.job_id}}">{{x.job_name}}</a></td>
 		<td>{{x.start_time.date}}</td>
 		<td>{{x.start_time.time}}</td>
 	</tr>	
